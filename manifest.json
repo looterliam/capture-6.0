@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Screen Capture",
+  "version": "1.0",
+  "description": "Capture an area of your screen",
+  "permissions": [
+    "activeTab",
+    "desktopCapture",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  }
+}
