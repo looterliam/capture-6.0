@@ -2,7 +2,7 @@ let startX, startY, endX, endY;
 let isSelecting = false;
 let selectionDiv;
 
-document.addEventListener('mousedown', (e) => {
+function onMouseDown(e) {
   if (e.button !== 0) return; // Only react to left mouse button
   startX = e.clientX;
   startY = e.clientY;
@@ -12,9 +12,9 @@ document.addEventListener('mousedown', (e) => {
   selectionDiv.style.border = '2px dashed #000';
   selectionDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
   document.body.appendChild(selectionDiv);
-});
+}
 
-document.addEventListener('mousemove', (e) => {
+function onMouseMove(e) {
   if (!isSelecting) return;
   endX = e.clientX;
   endY = e.clientY;
@@ -22,9 +22,9 @@ document.addEventListener('mousemove', (e) => {
   selectionDiv.style.top = `${Math.min(startY, endY)}px`;
   selectionDiv.style.width = `${Math.abs(endX - startX)}px`;
   selectionDiv.style.height = `${Math.abs(endY - startY)}px`;
-});
+}
 
-document.addEventListener('mouseup', (e) => {
+function onMouseUp(e) {
   if (!isSelecting) return;
   isSelecting = false;
   document.body.removeChild(selectionDiv);
@@ -35,7 +35,12 @@ document.addEventListener('mouseup', (e) => {
     height: Math.abs(endY - startY)
   };
   chrome.runtime.sendMessage({ action: 'captureScreen', area: selectedArea });
-});
+
+  // Remove event listeners after capture
+  document.removeEventListener('mousedown', onMouseDown);
+  document.removeEventListener('mousemove', onMouseMove);
+  document.removeEventListener('mouseup', onMouseUp);
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'startCapture') {
@@ -67,6 +72,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }).catch((err) => {
       console.error("Error: " + err);
     });
+  }
+
+  if (request.action === 'initiateCapture') {
+    // Add event listeners to start capturing
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   }
 });
 
