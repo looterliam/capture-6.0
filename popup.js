@@ -2,11 +2,7 @@ document.getElementById('captureButton').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
-      function: captureScreen
+      files: ['content.js', 'content.css']
     });
   });
 });
-
-function captureScreen() {
-  chrome.runtime.sendMessage({ action: 'captureScreen' });
-}
